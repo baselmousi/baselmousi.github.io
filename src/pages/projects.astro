@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getProjects } from '../lib/projects';
+
+const projects = getProjects();
+const featured = projects.filter((p) => p.tier === 'featured');
+const research = projects.filter((p) => p.tier === 'research');
+const earlier = projects.filter((p) => p.tier === 'earlier');
+---
+
+<Base title="Projects" description="Research projects by Basel Mousi.">
+  <h1 class="page-title">Projects</h1>
+
+  {
+    featured.length > 0 && (
+      <section class="section" aria-labelledby="featured">
+        <div class="section-head">
+          <h2 id="featured">Featured</h2>
+        </div>
+        <div class="stack">
+          {featured.map((p) => (
+            <ProjectCard project={p} size="large" />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    research.length > 0 && (
+      <section class="section" aria-labelledby="research">
+        <div class="section-head">
+          <h2 id="research">Research projects</h2>
+        </div>
+        <div class="grid">
+          {research.map((p) => (
+            <ProjectCard project={p} size="small" />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    earlier.length > 0 && (
+      <section class="section" aria-labelledby="earlier">
+        <div class="section-head">
+          <h2 id="earlier">Earlier work</h2>
+        </div>
+        <ul class="earlier">
+          {earlier.map((p) => (
+            <li id={p.slug}>
+              <h3>{p.title}</h3>
+              {p.oneLiner && <p class="one-liner">{p.oneLiner}</p>}
+              <p class="meta">{[p.role, p.org, p.period].filter(Boolean).join(' · ')}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .stack {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 720px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .earlier {
+    list-style: none;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .earlier li {
+    scroll-margin-top: 1.5rem;
+  }
+
+  .earlier li:target h3 {
+    color: var(--accent);
+  }
+
+  .earlier h3 {
+    font-size: 1.02rem;
+    line-height: 1.35;
+    margin-bottom: 0.15rem;
+  }
+
+  .earlier .one-liner {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 0.1rem;
+  }
+
+  .earlier .meta {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+</style>

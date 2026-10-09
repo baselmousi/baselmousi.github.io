@@ -1,0 +1,48 @@
+---
+import type { NewsItem } from '../lib/news';
+
+interface Props {
+  items: NewsItem[];
+}
+const { items } = Astro.props;
+---
+
+<ol class="news">
+  {
+    items.map((item) => (
+      <li>
+        <time datetime={item.datetime}>{item.date}</time>
+        <span class="text" set:html={item.html} />
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .news {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: 5.25rem 1fr;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  time {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+
+  .text :global(strong) {
+    font-weight: 600;
+  }
+</style>

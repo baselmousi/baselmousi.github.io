@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { NAV } from '../lib/site';
+---
+
+<Base title="Page not found">
+  <h1 class="page-title">Page not found</h1>
+  <p class="page-intro">That page doesn’t exist. Try one of these instead:</p>
+  <ul class="pages">
+    {
+      NAV.map((n) => (
+        <li>
+          <a href={n.href}>{n.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .pages {
+    margin-top: 1.25rem;
+    padding-left: 1.2rem;
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+import Icon from './Icon.astro';
+import { NAV, SITE_NAME } from '../lib/site';
+
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="site-header">
+  <div class="container bar">
+    <a class="wordmark" href="/" aria-current={path === '/' ? 'page' : undefined}>{SITE_NAME}</a>
+    <nav aria-label="Main">
+      <ul>
+        {
+          NAV.filter((n) => n.href !== '/').map((n) => (
+            <li>
+              <a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined}>
+                {n.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+      <span class="when-light"><Icon name="moon" size={17} /></span>
+      <span class="when-dark"><Icon name="sun" size={17} /></span>
+    </button>
+  </div>
+</header>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const button = document.querySelector('.theme-toggle');
+    const media = matchMedia('(prefers-color-scheme: dark)');
+    const current = () => root.dataset.theme || (media.matches ? 'dark' : 'light');
+    const sync = () => {
+      const dark = current() === 'dark';
+      button.setAttribute('aria-pressed', String(dark));
+      button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+      root.classList.toggle('is-dark', dark);
+    };
+    button.addEventListener('click', () => {
+      const next = current() === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {}
+      sync();
+    });
+    media.addEventListener('change', sync);
+    sync();
+  })();
+</script>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1.25rem;
+    padding-block: 0.9rem;
+  }
+
+  .wordmark {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--fg);
+    text-decoration: none;
+    margin-right: auto;
+  }
+
+  nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  nav ul {
+    display: flex;
+    gap: 1.1rem;
+    list-style: none;
+  }
+
+  nav a {
+    display: inline-block;
+    padding-block: 0.35rem;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1.5px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--fg);
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--fg);
+    border-bottom-color: var(--accent);
+  }
+
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    color: var(--muted);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    color: var(--fg);
+    border-color: var(--rule);
+  }
+
+  .when-dark {
+    display: none;
+  }
+
+  :global(.is-dark) .when-dark {
+    display: contents;
+  }
+
+  :global(.is-dark) .when-light {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    nav {
+      order: 0;
+      width: auto;
+    }
+  }
+</style>

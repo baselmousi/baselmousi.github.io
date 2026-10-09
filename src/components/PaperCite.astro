@@ -1,0 +1,62 @@
+---
+// Short citation of a paper inside a project card: badge, title (to its Publications entry), links.
+import type { Publication } from '../lib/publications';
+
+interface Props {
+  pub: Publication;
+}
+const { pub } = Astro.props;
+---
+
+<li class="cite">
+  {pub.abbr && <span class="badge">{pub.abbr}</span>}
+  <a class="cite-title" href={`/publications/#${pub.key}`}>{pub.title}</a>
+  {
+    pub.links.length > 0 && (
+      <span class="cite-links">
+        {pub.links.map((l) => (
+          <a href={l.href}>
+            {l.label}
+            <span class="visually-hidden"> for “{pub.title}”</span>
+          </a>
+        ))}
+      </span>
+    )
+  }
+</li>
+
+<style>
+  .cite {
+    font-size: 0.93rem;
+    line-height: 1.5;
+  }
+
+  .badge {
+    margin-right: 0.4rem;
+    vertical-align: 0.1em;
+  }
+
+  .cite-title {
+    color: var(--fg);
+    text-decoration-color: var(--rule);
+  }
+
+  .cite-title:hover {
+    color: var(--accent);
+    text-decoration-color: currentColor;
+  }
+
+  .cite-links {
+    margin-left: 0.35rem;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .cite-links a + a::before {
+    content: '·';
+    display: inline-block;
+    margin-inline: 0.3rem;
+    color: var(--faint);
+  }
+</style>

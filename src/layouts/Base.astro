@@ -1,0 +1,88 @@
+---
+import '@fontsource-variable/source-serif-4/opsz.css';
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getBio } from '../lib/bio';
+import { getLinks } from '../lib/links';
+import { headshot } from '../lib/images';
+import { SITE_NAME } from '../lib/site';
+
+interface Props {
+  /** Page name; omitted on the homepage. */
+  title?: string;
+  /** Defaults to the tagline from bio.md. */
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const { tagline } = getBio();
+const pageTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+const pageDescription = description ?? tagline;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Square crop of the headshot for link previews.
+const ogImage = await getImage({ src: headshot(), width: 600, height: 600, fit: 'cover', position: 'top', format: 'jpeg' });
+const ogImageUrl = new URL(ogImage.src, Astro.site);
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE_NAME,
+  url: Astro.site?.href,
+  image: ogImageUrl.href,
+  description: tagline,
+  sameAs: getLinks().filter((l) => l.href.startsWith('http')).map((l) => l.href),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={SITE_NAME} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content={title ? 'website' : 'profile'} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="600" />
+    <meta property="og:image:height" content="600" />
+    <meta property="og:image:alt" content={`Portrait of ${SITE_NAME}`} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
+
+    <!-- Apply the saved theme before first paint to avoid a flash. -->
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" class="container">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

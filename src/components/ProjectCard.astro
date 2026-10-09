@@ -1,0 +1,209 @@
+---
+import { Image } from 'astro:assets';
+import PaperCite from './PaperCite.astro';
+import type { Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+  size: 'large' | 'small';
+}
+const { project: p, size } = Astro.props;
+const meta = [p.role, p.org, p.period].filter(Boolean).join(' · ');
+const showImage = size === 'large' && p.image;
+---
+
+<article class:list={['card', size, { 'has-image': showImage }]} id={p.slug}>
+  {
+    showImage && (
+      <div class="image-tile media">
+        <Image src={p.image!} alt={`${p.title} logo`} width={168} densities={[1, 2]} />
+      </div>
+    )
+  }
+  <h3 class="title">{p.title}</h3>
+  {
+    (p.oneLiner || meta) && (
+      <div class="sub">
+        {p.oneLiner && <p class="one-liner">{p.oneLiner}</p>}
+        {meta && <p class="meta">{meta}</p>}
+      </div>
+    )
+  }
+  <div class="body">
+    {p.description && <p class="description" set:html={p.description} />}
+    {
+      p.papers.length > 0 && (
+        <div class="papers">
+          <h4>{p.papers.length === 1 ? 'Paper' : 'Papers'}</h4>
+          <ul>
+            {p.papers.map((pub) => (
+              <PaperCite pub={pub} />
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    {
+      (p.tags.length > 0 || p.links.length > 0) && (
+        <div class="foot">
+          {p.links.length > 0 && (
+            <ul class="btn-row">
+              {p.links.map((l) => (
+                <li>
+                  <a class="btn" href={l.href}>
+                    {l.label}
+                    <span class="visually-hidden"> for {p.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          {p.tags.length > 0 && (
+            <ul class="tags" aria-label="Topics">
+              {p.tags.map((t) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .card {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: 'title' 'sub' 'body';
+    gap: 0 1.25rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    scroll-margin-top: 1.5rem;
+    align-content: start;
+  }
+
+  /* Phone: logo beside the title, everything else below. Wider: logo in a left column. */
+  .card.has-image {
+    grid-template-columns: 4rem 1fr;
+    grid-template-areas: 'media title' 'sub sub' 'body body';
+    row-gap: 0.75rem;
+  }
+
+  .card:target {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .media {
+    grid-area: media;
+    width: 100%;
+    aspect-ratio: 1;
+    align-self: start;
+  }
+
+  .title {
+    grid-area: title;
+    align-self: center;
+  }
+
+  .sub {
+    grid-area: sub;
+    margin-bottom: 0.9rem;
+  }
+
+  .has-image .sub {
+    margin-bottom: 0.15rem;
+  }
+
+  .body {
+    grid-area: body;
+    min-width: 0;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+  }
+
+  .small h3 {
+    font-size: 1.05rem;
+  }
+
+  .one-liner {
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 0.3rem;
+  }
+
+  .small .one-liner {
+    font-size: 0.95rem;
+  }
+
+  .meta {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+
+  .description {
+    font-size: 0.97rem;
+  }
+
+  .small .description {
+    font-size: 0.93rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .papers {
+    margin-bottom: 1rem;
+  }
+
+  h4 {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0 0 0.45rem;
+  }
+
+  .papers ul {
+    list-style: none;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .card {
+      padding: 1.5rem;
+    }
+
+    .card.has-image {
+      grid-template-columns: 8.5rem 1fr;
+      grid-template-areas: 'media title' 'media sub' 'media body';
+      grid-template-rows: auto auto 1fr;
+      gap: 0 1.5rem;
+    }
+
+    .has-image .title {
+      align-self: start;
+    }
+
+    .has-image .sub {
+      margin-bottom: 0.9rem;
+    }
+  }
+</style>

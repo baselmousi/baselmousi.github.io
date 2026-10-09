@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import PubItem from '../components/PubItem.astro';
+import { getLinks } from '../lib/links';
+import { projectsByPaper } from '../lib/projects';
+import { getPublications, groupByYear } from '../lib/publications';
+
+const pubs = getPublications();
+const groups = groupByYear(pubs);
+const paperProjects = projectsByPaper();
+const hasEqual = pubs.some((p) => p.authors.some((a) => a.equal));
+const scholar = getLinks().find((l) => l.icon === 'scholar');
+---
+
+<Base title="Publications" description={`Publications by Basel Mousi, grouped by year.`}>
+  <h1 class="page-title">Publications</h1>
+  <p class="page-intro">
+    {hasEqual && <>* Equal contribution. </>}
+    {scholar && (
+      <>
+        Also on <a href={scholar.href}>Google Scholar</a>.
+      </>
+    )}
+  </p>
+
+  {
+    groups.length > 1 && (
+      <nav class="years" aria-label="Jump to year">
+        <ul>
+          {groups.map((g) => (
+            <li>
+              <a href={`#y${g.year}`}>{g.year}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )
+  }
+
+  {
+    groups.map((g) => (
+      <section class="year" aria-labelledby={`y${g.year}`}>
+        <h2 id={`y${g.year}`} class="year-head">
+          {g.year}
+        </h2>
+        <div class="pubs">
+          {g.pubs.map((p) => (
+            <PubItem pub={p} projects={paperProjects.get(p.key)} anchor />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .years {
+    margin-top: 1.25rem;
+  }
+
+  .years ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+  }
+
+  .years a {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    text-decoration: none;
+  }
+
+  .years a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .year {
+    margin-top: 2.75rem;
+  }
+
+  .year-head {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    scroll-margin-top: 1.5rem;
+  }
+
+  /* Highlight the paper a project card linked to. */
+  .pubs :global(.pub) {
+    scroll-margin-top: 1.5rem;
+  }
+
+  .pubs :global(.pub:target) {
+    margin-inline: -0.75rem;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+  }
+
+  .pubs :global(.pub:target .badge) {
+    background: var(--surface);
+  }
+</style>

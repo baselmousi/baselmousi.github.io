@@ -1,0 +1,134 @@
+---
+import Base from '../layouts/Base.astro';
+import { getExperience } from '../lib/experience';
+import { slugify } from '../lib/content';
+
+const sections = getExperience();
+// TODO: add download buttons for a long and a short PDF version of the CV once both files are in content/.
+---
+
+<Base title="CV" description="Education and research experience of Basel Mousi.">
+  <h1 class="page-title">CV</h1>
+
+  {
+    sections.map((section) => (
+      <section class="section" aria-labelledby={slugify(section.heading)}>
+        <div class="section-head">
+          <h2 id={slugify(section.heading)}>{section.heading}</h2>
+        </div>
+        <ol class="entries">
+          {section.entries.map((e) => (
+            <li class="entry">
+              <p class="period">{e.period}</p>
+              <div class="content">
+                <h3>{e.title}</h3>
+                {e.org && <p class="org">{e.org}</p>}
+                {e.summary && <p class="summary" set:html={e.summary} />}
+                {e.details && <p class="summary" set:html={e.details} />}
+                {e.projects.length > 0 && (
+                  <ul class="projects" aria-label={`Projects at ${e.org ?? e.title}`}>
+                    {e.projects.map((p) => (
+                      <li>
+                        <a href={`/projects/#${p.slug}`}>{p.title}</a>
+                        {p.role && <span class="role">{p.role}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .entries {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  /* Phone: dates above the title. Wider: dates in a left column. */
+  .entry {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .period {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+  }
+
+  .period:empty {
+    display: none;
+  }
+
+  h3 {
+    font-size: 1.08rem;
+    line-height: 1.35;
+  }
+
+  .org {
+    margin: 0.1rem 0 0;
+    color: var(--muted);
+  }
+
+  .summary {
+    margin: 0.45rem 0 0;
+    font-size: 0.95rem;
+  }
+
+  .projects {
+    list-style: none;
+    margin-top: 0.6rem;
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.93rem;
+  }
+
+  .projects li {
+    position: relative;
+    padding-left: 1.2rem;
+  }
+
+  .projects li::before {
+    content: '↳';
+    position: absolute;
+    left: 0;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--faint);
+  }
+
+  .role {
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
+
+  @media (min-width: 640px) {
+    .entry {
+      grid-template-columns: 11rem 1fr;
+      gap: 1.5rem;
+    }
+
+    .period {
+      padding-top: 0.2rem;
+    }
+
+    /* Keep the empty date cell so the content stays in the right column. */
+    .period:empty {
+      display: block;
+    }
+  }
+</style>

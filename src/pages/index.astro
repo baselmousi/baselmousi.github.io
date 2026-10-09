@@ -1,0 +1,246 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import NewsList from '../components/NewsList.astro';
+import ProjectRow from '../components/ProjectRow.astro';
+import PubItem from '../components/PubItem.astro';
+import { getBio } from '../lib/bio';
+import { getLinks } from '../lib/links';
+import { getNews } from '../lib/news';
+import { getProjects, projectsByPaper } from '../lib/projects';
+import { getPublications } from '../lib/publications';
+import { headshot } from '../lib/images';
+import { SITE_NAME } from '../lib/site';
+
+const HOME_NEWS_COUNT = 5;
+
+const bio = getBio();
+const links = getLinks();
+const news = getNews().slice(0, HOME_NEWS_COUNT);
+const featured = getProjects().filter((p) => p.featured);
+const selected = getPublications().filter((p) => p.selected);
+const paperProjects = projectsByPaper();
+const hasEqual = selected.some((p) => p.authors.some((a) => a.equal));
+---
+
+<Base>
+  <section class="intro" aria-labelledby="name">
+    <Image
+      class="headshot"
+      src={headshot()}
+      alt={`Portrait of ${SITE_NAME}`}
+      width={200}
+      densities={[1, 2]}
+      loading="eager"
+      fetchpriority="high"
+    />
+    <h1 id="name">{SITE_NAME}</h1>
+    <div class="intro-text">
+      <p class="tagline">{bio.tagline}</p>
+      <ul class="profile-links">
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} aria-label={l.label} title={l.label}>
+                <Icon name={l.icon} size={19} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <div class="bio" set:html={bio.html} />
+
+  {
+    bio.interests.length > 0 && (
+      <div class="interests">
+        <h2 class="interests-label">Research interests</h2>
+        <ul class="tags">
+          {bio.interests.map((i) => (
+            <li>{i}</li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  {
+    news.length > 0 && (
+      <section class="section" aria-labelledby="news">
+        <div class="section-head">
+          <h2 id="news">News</h2>
+          <a class="more" href="/news/">
+            All news <Icon name="arrow" size={14} />
+          </a>
+        </div>
+        <NewsList items={news} />
+      </section>
+    )
+  }
+
+  {
+    featured.length > 0 && (
+      <section class="section" aria-labelledby="projects">
+        <div class="section-head">
+          <h2 id="projects">Featured projects</h2>
+          <a class="more" href="/projects/">
+            All projects <Icon name="arrow" size={14} />
+          </a>
+        </div>
+        <ul class="project-list">
+          {featured.map((p) => (
+            <ProjectRow project={p} />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    selected.length > 0 && (
+      <section class="section" aria-labelledby="publications">
+        <div class="section-head">
+          <h2 id="publications">Selected publications</h2>
+          <a class="more" href="/publications/">
+            All publications <Icon name="arrow" size={14} />
+          </a>
+        </div>
+        {selected.map((p) => (
+          <PubItem pub={p} projects={paperProjects.get(p.key)} />
+        ))}
+        {hasEqual && <p class="footnote">* Equal contribution</p>}
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  /* Phone: photo and name side by side, tagline and links below.
+     Wider: photo on the left, everything else stacked beside it. */
+  .intro {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'photo name'
+      'text text';
+    gap: 1rem 1.25rem;
+    align-items: center;
+  }
+
+  .headshot {
+    grid-area: photo;
+  }
+
+  h1 {
+    grid-area: name;
+  }
+
+  .intro-text {
+    grid-area: text;
+  }
+
+  .headshot {
+    width: 7.5rem;
+    height: 7.5rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 30%;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.5rem);
+  }
+
+  @media (min-width: 640px) {
+    h1 {
+      margin-bottom: 0.4rem;
+    }
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 0.6rem;
+  }
+
+  .profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    list-style: none;
+    margin-left: -0.5rem;
+  }
+
+  .profile-links a {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--muted);
+    border-radius: 8px;
+  }
+
+  .profile-links a:hover {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .bio {
+    margin-top: 2rem;
+  }
+
+  .interests {
+    margin-top: 1.5rem;
+  }
+
+  .interests-label {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 0.6rem;
+  }
+
+  .interests .tags {
+    font-size: 0.8rem;
+  }
+
+  .project-list {
+    list-style: none;
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .footnote {
+    margin: 1.5rem 0 0;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+
+  @media (min-width: 640px) {
+    .intro {
+      grid-template-areas:
+        'photo .'
+        'photo name'
+        'photo text'
+        'photo .';
+      grid-template-rows: 1fr auto auto 1fr;
+      gap: 0 2rem;
+    }
+
+    .headshot {
+      width: 12.5rem;
+      height: 12.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,185 @@
+---
+import Icon from './Icon.astro';
+import type { Publication } from '../lib/publications';
+import type { Project } from '../lib/projects';
+
+interface Props {
+  pub: Publication;
+  projects?: Project[];
+  /** Adds id={pub.key} so other pages can link to this entry. */
+  anchor?: boolean;
+}
+const { pub, projects = [], anchor = false } = Astro.props;
+---
+
+<article class="pub" id={anchor ? pub.key : undefined}>
+  <h3 class="title">
+    {pub.url ? <a href={pub.url}>{pub.title}</a> : pub.title}
+  </h3>
+  <p class="authors">
+    {
+      pub.authors.map((a, i) => (
+        <>
+          {a.isMe ? <strong>{a.name}</strong> : a.name}
+          {a.equal && (
+            <sup class="equal" title="Equal contribution">
+              *
+            </sup>
+          )}
+          {i < pub.authors.length - 1 && ', '}
+        </>
+      ))
+    }
+  </p>
+  <p class="venue">
+    {pub.abbr && <span class="badge">{pub.abbr}</span>}
+    {pub.venue && <span class="venue-name">{pub.venue}</span>}
+  </p>
+  <ul class="btn-row actions">
+    {
+      pub.links.map((l) => (
+        <li>
+          <a class="btn" href={l.href}>
+            {l.label}
+            <span class="visually-hidden">for “{pub.title}”</span>
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <button class="btn" type="button" data-bibtex={pub.bibtex}>
+        <Icon name="copy" size={13} />
+        <span class="label">BibTeX</span>
+        <span class="visually-hidden">: copy citation for “{pub.title}”</span>
+      </button>
+    </li>
+    {
+      projects.map((p) => (
+        <li>
+          <a class="project-tag" href={`/projects/#${p.slug}`}>
+            <span class="visually-hidden">Project: </span>
+            {p.title}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</article>
+
+<script>
+  const status = Object.assign(document.createElement('p'), { className: 'visually-hidden' });
+  status.setAttribute('aria-live', 'polite');
+  document.body.append(status);
+
+  async function copy(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const area = Object.assign(document.createElement('textarea'), { value: text, readOnly: true });
+      area.style.cssText = 'position:fixed;opacity:0';
+      document.body.append(area);
+      area.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {}
+      area.remove();
+      return ok;
+    }
+  }
+
+  document.addEventListener('click', async (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>('[data-bibtex]');
+    if (!button) return;
+    const label = button.querySelector('.label')!;
+    const ok = await copy(button.dataset.bibtex ?? '');
+    label.textContent = ok ? 'Copied' : 'Copy failed';
+    status.textContent = ok ? 'BibTeX copied to clipboard' : 'Could not copy BibTeX';
+    setTimeout(() => (label.textContent = 'BibTeX'), 2000);
+  });
+</script>
+
+<style>
+  .pub {
+    margin-bottom: 1.75rem;
+  }
+
+  .pub:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .title {
+    font-size: 1.06rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 0.3rem;
+  }
+
+  .title a {
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .title a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .authors {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .authors strong {
+    color: var(--fg);
+    font-weight: 650;
+  }
+
+  .equal {
+    font-family: var(--sans);
+    font-size: 0.7em;
+    margin-left: 0.05em;
+    cursor: help;
+  }
+
+  .venue {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .venue-name {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .actions {
+    align-items: center;
+  }
+
+  .project-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.85rem;
+    padding-inline: 0.3rem;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .project-tag::before {
+    content: '↳';
+    margin-right: 0.3rem;
+    color: var(--faint);
+  }
+
+  .project-tag:hover {
+    text-decoration: underline;
+  }
+</style>

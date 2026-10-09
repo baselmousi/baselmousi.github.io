@@ -1,0 +1,67 @@
+---
+// Compact project entry for the homepage: thumbnail, title, one-liner.
+import { Image } from 'astro:assets';
+import type { Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+}
+const { project: p } = Astro.props;
+---
+
+<li class="row">
+  {
+    p.image && (
+      <div class="image-tile thumb">
+        <Image src={p.image} alt="" width={72} densities={[1, 2]} />
+      </div>
+    )
+  }
+  <div>
+    <h3><a href={`/projects/#${p.slug}`}>{p.title}</a></h3>
+    {p.oneLiner && <p class="one-liner">{p.oneLiner}</p>}
+    {(p.role || p.org) && <p class="meta">{[p.role, p.org].filter(Boolean).join(' · ')}</p>}
+  </div>
+</li>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .thumb {
+    width: 4.5rem;
+    aspect-ratio: 1;
+  }
+
+  h3 {
+    font-size: 1.04rem;
+    line-height: 1.35;
+    margin-bottom: 0.15rem;
+  }
+
+  h3 a {
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .one-liner {
+    font-size: 0.97rem;
+    color: var(--muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .meta {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+</style>

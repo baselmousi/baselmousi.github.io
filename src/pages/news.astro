@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import NewsList from '../components/NewsList.astro';
+import { getNews } from '../lib/news';
+
+const news = getNews();
+---
+
+<Base title="News" description="News and updates from Basel Mousi.">
+  <h1 class="page-title">News</h1>
+  <div class="section">
+    <NewsList items={news} />
+  </div>
+</Base>
