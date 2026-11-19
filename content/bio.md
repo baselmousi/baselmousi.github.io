@@ -6,7 +6,7 @@ MSc Data Science student at EPFL. NLP researcher working on multilingual and mul
 
 ## Homepage bio (first person)
 
-I'm a Master's student in Data Science at EPFL. Before that, I spent nearly four years as a Research Assistant (research engineering role) at the Qatar Computing Research Institute (QCRI), where I led the technical implementation of projects on multilingual knowledge editing, multilingual reasoning, simultaneous speech translation, and benchmarks for Arabic dialects and culture.
+I'm a Master's student in Data Science at EPFL. Before that, I spent nearly four years as a Research Assistant (research engineering role) at the Qatar Computing Research Institute (QCRI).
 
 My research asks how large language models represent and use knowledge across languages and modalities, and where that breaks down. I've worked on interpreting the internals of language models, on editing what models know so the change carries across languages, and on hallucination and instability in vision-language and speech models. Much of this work focuses on Arabic and its dialects. My papers have appeared at ACL, EMNLP, COLING, EACL and Interspeech.
 
