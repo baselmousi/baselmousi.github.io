@@ -20,7 +20,7 @@ const { project: p } = Astro.props;
   <div>
     <h3><a href={`/projects/#${p.slug}`}>{p.title}</a></h3>
     {p.oneLiner && <p class="one-liner">{p.oneLiner}</p>}
-    {(p.role || p.org) && <p class="meta">{[p.role, p.org].filter(Boolean).join(' · ')}</p>}
+    {p.org && <p class="meta">{p.org}</p>}
   </div>
 </li>
 

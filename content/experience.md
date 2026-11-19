@@ -7,7 +7,7 @@
        summary:  one line, shown under the role
        details:  optional extra line (education only)
        projects: titles from projects.md, comma-separated. Each is rendered as a link to its
-                 project card (with the role from projects.md), so its details are not repeated here.
+                 project card, so its details are not repeated here.
      Roles appear in the order written here. -->
 
 ## Education
@@ -23,7 +23,7 @@
 
 ## Work
 
-### Research Engineer
+### Research Assistant (research engineering role)
 - **org:** Qatar Computing Research Institute (QCRI)
 - **period:** Dec 2022 – Aug 2026
 - **summary:** Led projects on multilingual knowledge editing, multilingual reasoning, simultaneous speech translation, and benchmarks for Arabic dialects and culture.

@@ -78,7 +78,6 @@ cards), `## Research projects` (smaller cards) or `## Earlier work` (a compact l
 ### Project Title
 - **one_liner:** One sentence shown under the title.
 - **description:** A short paragraph.
-- **role:** Team Lead
 - **org:** QCRI
 - **tags:** Tag One, Tag Two
 - **papers:** bibkey2026a, bibkey2025b

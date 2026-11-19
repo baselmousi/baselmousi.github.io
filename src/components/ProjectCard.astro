@@ -8,7 +8,7 @@ interface Props {
   size: 'large' | 'small';
 }
 const { project: p, size } = Astro.props;
-const meta = [p.role, p.org, p.period].filter(Boolean).join(' · ');
+const meta = [p.org, p.period].filter(Boolean).join(' · ');
 const showImage = size === 'large' && p.image;
 ---
 

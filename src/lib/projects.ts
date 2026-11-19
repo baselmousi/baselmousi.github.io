@@ -23,7 +23,6 @@ export interface Project {
   oneLiner?: string;
   /** Description as inline HTML. */
   description?: string;
-  role?: string;
   org?: string;
   period?: string;
   tags: string[];
@@ -78,7 +77,6 @@ export function getProjects(): Project[] {
         featured: clean(f.featured)?.toLowerCase() === 'true',
         oneLiner: clean(f.one_liner),
         description: description && inlineMarkdown(description),
-        role: clean(f.role),
         org: clean(f.org),
         period: clean(f.period),
         tags: splitList(f.tags),

@@ -53,7 +53,7 @@ const earlier = projects.filter((p) => p.tier === 'earlier');
             <li id={p.slug}>
               <h3>{p.title}</h3>
               {p.oneLiner && <p class="one-liner">{p.oneLiner}</p>}
-              <p class="meta">{[p.role, p.org, p.period].filter(Boolean).join(' · ')}</p>
+              {(p.org || p.period) && <p class="meta">{[p.org, p.period].filter(Boolean).join(' · ')}</p>}
             </li>
           ))}
         </ul>

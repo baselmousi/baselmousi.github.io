@@ -30,7 +30,6 @@ const sections = getExperience();
                     {e.projects.map((p) => (
                       <li>
                         <a href={`/projects/#${p.slug}`}>{p.title}</a>
-                        {p.role && <span class="role">{p.role}</span>}
                       </li>
                     ))}
                   </ul>
@@ -105,14 +104,6 @@ const sections = getExperience();
     left: 0;
     font-family: var(--sans);
     font-size: 0.8rem;
-    color: var(--faint);
-  }
-
-  .role {
-    margin-left: 0.5rem;
-    white-space: nowrap;
-    font-family: var(--sans);
-    font-size: 0.75rem;
     color: var(--faint);
   }
 
